@@ -1,0 +1,33 @@
+//
+//  WeatherOverviewService.swift
+//  SimpleWeather
+//
+//  Created by Michael Kozlyukov on 14.05.2025.
+//
+
+import CoreLocation
+
+protocol WeatherService {
+    func fetchCurrentWeather(location: CLLocation, completion: @escaping (Result<CurrentWeatherDTO, Error>) -> Void)
+}
+
+final class WeatherServiceImplementation: WeatherService {
+    func fetchCurrentWeather(location: CLLocation, completion: @escaping (Result<CurrentWeatherDTO, Error>) -> Void) {
+        NetworkClient.shared.request(
+            urlString: Constants.currentWeatherUrl,
+            queryParams: [
+                "q": " \(location.coordinate.latitude),\(location.coordinate.longitude)",
+                "key": "\(Constants.apiKey)"
+            ],
+            responseType: CurrentWeatherDTO.self
+        ) { result in
+            switch result {
+            case .success(let currentWeater):
+                completion(.success(currentWeater))
+            case .failure(let error):
+               completion(.failure(error))
+            }
+        }
+    }
+    
+}
