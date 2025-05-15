@@ -8,28 +8,30 @@
 import Foundation
 
 struct CurrentWeatherDTO: Codable {
-    let location: Location
-    let current: Current
+    let location: Location?
+    let current: Current?
 }
 
 struct Current: Codable {
-    let tempC: Double
-    let condition: Condition
+    let tempC: Double?
+    let condition: Condition?
+    let time: String?
     
     enum CodingKeys: String, CodingKey {
         case tempC = "temp_c"
         case condition
+        case time
     }
 }
 
 struct Condition: Codable {
-    let text, icon: String
-    let code: Int
+    let text, icon: String?
+    let code: Int?
 }
 
 struct Location: Codable {
-    let name, region, country: String
-    let lat, lon: Double
+    let name, region, country: String?
+    let lat, lon: Double?
     
     enum CodingKeys: String, CodingKey {
         case name, region, country, lat, lon

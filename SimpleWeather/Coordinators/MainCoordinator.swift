@@ -19,6 +19,7 @@ class MainCoordinator: Coordinator {
         let repository = WeatherRepositoryImplementation(weatherService: WeatherServiceImplementation())
         let viewModel = WeatherOverviewViewModel(
             currentWeatherUseCase: CurrentWeatherUseCaseImpl(weatherRepository: repository),
+            weatherForecastUseCase: WeatherForecastUseCaseImpl(weatherRepository: repository),
             locationService: LocationService(),
             mapper: WeatherMapperImpl()
         )

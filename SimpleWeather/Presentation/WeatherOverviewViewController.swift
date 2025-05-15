@@ -9,6 +9,8 @@ import UIKit
 
 final class WeatherOverviewViewController: UIViewController {
     let viewModel: WeatherOverviewViewModel
+    private var hourForecastCollectionView: UICollectionView!
+    private let items = ["Ячейка 1", "Ячейка 2", "Ячейка 3", "Ячейка 4", "Ячейка 5"]
     
     private let locationLabel: UILabel = {
         let label = UILabel()
@@ -63,11 +65,20 @@ extension WeatherOverviewViewController: UpdateWeatherDelegate {
             self.temperatureLabel.text = "\(model.temperature)"
             self.conditionLabel.text = model.condition
         }
+        
+        DispatchQueue.main.async {
+            self.hourForecastCollectionView.reloadData()
+        }
     }
 }
 
 private extension WeatherOverviewViewController {
     private func setupUI() {
+        setupBaseForecastElements()
+        setupHourForecastCollectionView()
+    }
+    
+    private func setupBaseForecastElements() {
         view.addSubview(locationLabel)
         view.addSubview(temperatureLabel)
         view.addSubview(conditionLabel)
@@ -82,5 +93,63 @@ private extension WeatherOverviewViewController {
             conditionLabel.topAnchor.constraint(equalTo: temperatureLabel.bottomAnchor, constant: 8),
             conditionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
+    }
+    
+    private func setupHourForecastCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 16
+        layout.minimumInteritemSpacing = 8
+        
+        hourForecastCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        hourForecastCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        hourForecastCollectionView.backgroundColor = .green
+        hourForecastCollectionView.layer.cornerRadius = 8
+        
+        hourForecastCollectionView.dataSource = self
+        hourForecastCollectionView.delegate = self
+        
+        hourForecastCollectionView.register(HourForecastCollectionViewCell.self, forCellWithReuseIdentifier: HourForecastCollectionViewCell.identifier)
+        
+        view.addSubview(hourForecastCollectionView)
+        
+        NSLayoutConstraint.activate([
+            hourForecastCollectionView.topAnchor.constraint(equalTo: conditionLabel.bottomAnchor, constant: 50),
+            hourForecastCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            hourForecastCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            hourForecastCollectionView.heightAnchor.constraint(equalToConstant: 200)
+        ])
+    }
+}
+
+
+// MARK: - UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
+extension WeatherOverviewViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return viewModel.hoursDataSource.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: HourForecastCollectionViewCell.identifier,
+            for: indexPath
+        ) as? HourForecastCollectionViewCell else {
+            
+            return UICollectionViewCell()
+        }
+        
+        cell.configure(model: viewModel.hoursDataSource[indexPath.item])
+        return cell
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        
+        let width = (collectionView.frame.width - 20) / 2
+        return CGSize(width: width, height: 100)
     }
 }
