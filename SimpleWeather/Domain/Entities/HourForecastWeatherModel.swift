@@ -6,7 +6,7 @@
 //
 
 struct HourForecastWeatherModel {
-    let hour: Int
+    var hour: String
     let icon: String
     let temperature: Double
 }

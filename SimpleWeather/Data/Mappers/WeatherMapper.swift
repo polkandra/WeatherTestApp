@@ -40,15 +40,38 @@ final class WeatherMapperImpl: WeatherMapper {
     func hourWeatherModel(weatherForecast: WeatherForecastDTO) -> [HourForecastWeatherModel] {
         var hoursDataSource: [HourForecastWeatherModel] = []
         
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        formatter.locale = .current
+    
+        let hour = calendar.component(.hour, from: Date.today)
+        let todayStart = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: Date.today)!
+    
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date.today)!
+        let tomorrowEnd = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: tomorrow)!
+        
         weatherForecast.forecast?.forecastday?.forEach { forecastday in
-            forecastday.hour?.forEach { hour in
+            let filtered = forecastday.hour?.filter { hour in
+                guard let date = formatter.date(from: hour.time ?? "") else {
+                    return false
+                }
+               
+                return date >= todayStart && date <= tomorrowEnd
+            }
+            
+            filtered?.forEach { current in
                 hoursDataSource.append(
                     HourForecastWeatherModel(
-                        hour: Date.from(hour.time ?? "")?.hour ?? 0,
-                        icon: hour.condition?.icon ?? "",
-                        temperature: hour.tempC ?? 0
+                        hour: "\(Date.from(current.time ?? "")?.hour ?? 0)",
+                        icon: current.condition?.icon ?? "",
+                        temperature: current.tempC ?? 0
                     )
                 )
+            }
+            
+            if !hoursDataSource.isEmpty {
+                hoursDataSource[0].hour = "Now"
             }
         }
         

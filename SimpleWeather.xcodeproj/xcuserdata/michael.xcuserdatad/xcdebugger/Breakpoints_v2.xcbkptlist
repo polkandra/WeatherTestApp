@@ -39,16 +39,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "97CBC399-44DA-49F5-8BAA-EBA381BB97CD"
+            uuid = "6E560D32-BA9A-4A64-BAAB-D00A94E37F3D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SimpleWeather/Presentation/Views/HourForecastCollectionViewCell.swift"
+            filePath = "SimpleWeather/Presentation/WeatherOverviewViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "25"
-            endingLineNumber = "25"
-            landmarkName = "configure(model:)"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
+            landmarkName = "showActivityIndicator()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

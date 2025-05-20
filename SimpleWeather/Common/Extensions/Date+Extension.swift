@@ -18,4 +18,8 @@ extension Date {
         formatter.locale = Locale.current
         return formatter.date(from: string)
     }
+
+    static var today: Date {
+        return Date()
+    }
 }

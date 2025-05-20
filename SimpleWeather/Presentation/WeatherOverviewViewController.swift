@@ -10,11 +10,34 @@ import UIKit
 final class WeatherOverviewViewController: UIViewController {
     let viewModel: WeatherOverviewViewModel
     private var hourForecastCollectionView: UICollectionView!
-    private let items = ["Ячейка 1", "Ячейка 2", "Ячейка 3", "Ячейка 4", "Ячейка 5"]
+    
+    private let activityIndicator = WeatherStyleActivityIndicator(
+        frame: CGRect(x: 0, y: 0, width: 50, height: 50)
+    )
+    
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        return scrollView
+    }()
+    
+    private let contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let backgroundImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "weatherPic")
+        imageView.contentMode = .scaleAspectFill
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     private let locationLabel: UILabel = {
         let label = UILabel()
-        label.text = "Cupertino"
         label.font = UIFont.systemFont(ofSize: 32, weight: .semibold)
         label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -23,7 +46,6 @@ final class WeatherOverviewViewController: UIViewController {
     
     private let temperatureLabel: UILabel = {
         let label = UILabel()
-        label.text = "22°"
         label.font = UIFont.systemFont(ofSize: 80, weight: .thin)
         label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -32,8 +54,15 @@ final class WeatherOverviewViewController: UIViewController {
     
     private let conditionLabel: UILabel = {
         let label = UILabel()
-        label.text = "Sunny"
         label.font = UIFont.systemFont(ofSize: 24, weight: .regular)
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let forecastLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 23, weight: .regular)
         label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -55,15 +84,37 @@ final class WeatherOverviewViewController: UIViewController {
     }
 }
 
+
+// MARK: - UpdateWeatherDelegate
+
 extension WeatherOverviewViewController: UpdateWeatherDelegate {
+    func showErrorPopUp() {
+        DispatchQueue.main.async {
+            self.showWeatherErrorAlert(on: self)
+        }
+    }
+    
+    func showActivityIndicator() {
+        activityIndicator.center = contentView.center
+        contentView.addSubview(activityIndicator)
+    }
+    
+    func hideActivityIndicator() {
+        DispatchQueue.main.async {
+            self.activityIndicator.removeFromSuperview()
+        }
+    }
+    
     func updateWeather(model: CurrentWeatherModel) {
         DispatchQueue.main.async {
             self.locationLabel.fadeTransition(0.2)
             self.temperatureLabel.fadeTransition(0.2)
             self.conditionLabel.fadeTransition(0.2)
+            self.forecastLabel.fadeTransition(0.2)
             self.locationLabel.text = model.location
-            self.temperatureLabel.text = "\(model.temperature)"
+            self.temperatureLabel.text = "\(Int(model.temperature.rounded(.towardZero)))°"
             self.conditionLabel.text = model.condition
+            self.forecastLabel.text = "Min: \(Int(model.minTemperature.rounded(.towardZero)))°, max: \(Int(model.maxTemperature.rounded(.towardZero)))°"
         }
         
         DispatchQueue.main.async {
@@ -72,58 +123,121 @@ extension WeatherOverviewViewController: UpdateWeatherDelegate {
     }
 }
 
+
+// MARK: - Private methods
+
 private extension WeatherOverviewViewController {
     private func setupUI() {
+        navigationController?.setNavigationBarHidden(true, animated: true)
+        view.backgroundColor = .systemBlue
         setupBaseForecastElements()
         setupHourForecastCollectionView()
     }
     
     private func setupBaseForecastElements() {
-        view.addSubview(locationLabel)
-        view.addSubview(temperatureLabel)
-        view.addSubview(conditionLabel)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubview(backgroundImageView)
+        contentView.addSubview(locationLabel)
+        contentView.addSubview(temperatureLabel)
+        contentView.addSubview(conditionLabel)
+        contentView.addSubview(forecastLabel)
         
         NSLayoutConstraint.activate([
-            locationLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            locationLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            temperatureLabel.topAnchor.constraint(equalTo: locationLabel.bottomAnchor, constant: 8),
-            temperatureLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor),
             
-            conditionLabel.topAnchor.constraint(equalTo: temperatureLabel.bottomAnchor, constant: 8),
-            conditionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            backgroundImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            backgroundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            locationLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 16),
+            locationLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+          
+            temperatureLabel.topAnchor.constraint(equalTo: locationLabel.bottomAnchor),
+            temperatureLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+           
+            conditionLabel.topAnchor.constraint(equalTo: temperatureLabel.bottomAnchor),
+            conditionLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+           
+            forecastLabel.topAnchor.constraint(equalTo: conditionLabel.bottomAnchor),
+            forecastLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
         ])
     }
     
     private func setupHourForecastCollectionView() {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 16
+        layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 8
         
         hourForecastCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        hourForecastCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        hourForecastCollectionView.backgroundColor = .green
+        hourForecastCollectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        hourForecastCollectionView.backgroundColor = .systemBlue.withAlphaComponent(0.5)
         hourForecastCollectionView.layer.cornerRadius = 8
+        hourForecastCollectionView.showsHorizontalScrollIndicator = false
+        hourForecastCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
         hourForecastCollectionView.dataSource = self
         hourForecastCollectionView.delegate = self
         
-        hourForecastCollectionView.register(HourForecastCollectionViewCell.self, forCellWithReuseIdentifier: HourForecastCollectionViewCell.identifier)
+        hourForecastCollectionView.register(
+            HourForecastCollectionViewCell.self,
+            forCellWithReuseIdentifier: HourForecastCollectionViewCell.identifier
+        )
         
-        view.addSubview(hourForecastCollectionView)
+        contentView.addSubview(hourForecastCollectionView)
         
         NSLayoutConstraint.activate([
-            hourForecastCollectionView.topAnchor.constraint(equalTo: conditionLabel.bottomAnchor, constant: 50),
-            hourForecastCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            hourForecastCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            hourForecastCollectionView.heightAnchor.constraint(equalToConstant: 200)
+            hourForecastCollectionView.topAnchor.constraint(equalTo: forecastLabel.bottomAnchor, constant: 50),
+            hourForecastCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            hourForecastCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            hourForecastCollectionView.heightAnchor.constraint(equalToConstant: 120),
         ])
+    }
+    
+    func showWeatherErrorAlert(on viewController: UIViewController) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: """
+                    Не удалось получить данные о погоде. 
+                    Проверьте подключение к интернету и попробуйте снова.
+                    """,
+            preferredStyle: .alert
+        )
+        
+        let retryAction = UIAlertAction(
+            title: "Повторить",
+            style: .default
+        ) { [weak self] _ in
+            
+            guard let self else {
+                return
+            }
+            
+            self.viewModel.retryFetchingWeather()
+        }
+        
+        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel, handler: nil)
+        alert.addAction(retryAction)
+        alert.addAction(cancelAction)
+        viewController.present(alert, animated: true, completion: nil)
     }
 }
 
 
 // MARK: - UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
+
 extension WeatherOverviewViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.hoursDataSource.count
@@ -149,7 +263,6 @@ extension WeatherOverviewViewController: UICollectionViewDataSource, UICollectio
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
         
-        let width = (collectionView.frame.width - 20) / 2
-        return CGSize(width: width, height: 100)
+        return CGSize(width: 50, height: 100)
     }
 }

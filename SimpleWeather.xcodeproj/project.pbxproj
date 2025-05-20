@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C442C8D2DDCC0C40076EABC /* WeatherActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C442C8C2DDCC0C40076EABC /* WeatherActivityIndicator.swift */; };
 		4C7F151C2DD5F0ED00A91862 /* HourForecastCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7F151B2DD5F0ED00A91862 /* HourForecastCollectionViewCell.swift */; };
 		4C7F15202DD5FA3A00A91862 /* UIimageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7F151F2DD5FA3A00A91862 /* UIimageView+Extension.swift */; };
 		4C7F15222DD5FD7300A91862 /* WeatherForecastDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7F15212DD5FD7300A91862 /* WeatherForecastDTO.swift */; };
@@ -34,6 +35,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4C442C8C2DDCC0C40076EABC /* WeatherActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherActivityIndicator.swift; sourceTree = "<group>"; };
 		4C7F151B2DD5F0ED00A91862 /* HourForecastCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourForecastCollectionViewCell.swift; sourceTree = "<group>"; };
 		4C7F151F2DD5FA3A00A91862 /* UIimageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIimageView+Extension.swift"; sourceTree = "<group>"; };
 		4C7F15212DD5FD7300A91862 /* WeatherForecastDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherForecastDTO.swift; sourceTree = "<group>"; };
@@ -73,10 +75,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4C7F151A2DD5F0B400A91862 /* Views */ = {
+		4C442C8B2DDCC09D0076EABC /* Cells */ = {
 			isa = PBXGroup;
 			children = (
 				4C7F151B2DD5F0ED00A91862 /* HourForecastCollectionViewCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		4C7F151A2DD5F0B400A91862 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4C442C8B2DDCC09D0076EABC /* Cells */,
+				4C442C8C2DDCC0C40076EABC /* WeatherActivityIndicator.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -308,6 +319,7 @@
 				4CC9FF922DD4C0FE009C5F93 /* WeatherOverviewViewModel.swift in Sources */,
 				4CC9FF882DD4C058009C5F93 /* AppDelegate.swift in Sources */,
 				4C7F15282DD620C800A91862 /* HourForecastWeatherModel.swift in Sources */,
+				4C442C8D2DDCC0C40076EABC /* WeatherActivityIndicator.swift in Sources */,
 				4CC9FF9E2DD4DFC5009C5F93 /* CurrentWeatherDTO.swift in Sources */,
 				4C7F15202DD5FA3A00A91862 /* UIimageView+Extension.swift in Sources */,
 				4CC9FF892DD4C058009C5F93 /* Coordinator.swift in Sources */,

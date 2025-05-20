@@ -12,9 +12,7 @@ class HourForecastCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .systemBlue
         createDayForecastStackView()
-        setupIconImageConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -22,10 +20,18 @@ class HourForecastCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(model: HourForecastWeatherModel) {
+        hourLabel.fadeTransition(0.2)
+        temperatureLabel.fadeTransition(0.2)
         hourLabel.text = "\(model.hour)"
-        temperatureLabel.text = "\(model.temperature)"
-        conditionImageView.setImage(from: "https:\(model.icon)", placeholder: UIImage(systemName: "scribble"))
+        temperatureLabel.text = "\(Int(model.temperature.rounded(.towardZero)))°"
+        
+        conditionImageView.setImage(
+            from: "https:\(model.icon)",
+            placeholder: UIImage(systemName: "scribble")
+        )
     }
+    
+    private var stackView = UIStackView()
     
     private let hourLabel: UILabel = {
         let label = UILabel()
@@ -48,37 +54,31 @@ class HourForecastCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.text = "12°C"
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: 23, weight: .semibold)
+        label.font = UIFont.systemFont(ofSize: 19, weight: .semibold)
         label.textColor = .white
         return label
     }()
 }
 
+
+// MARK: - Private methods
+
 private extension HourForecastCollectionViewCell {
     func createDayForecastStackView() {
-        let stackView = UIStackView(arrangedSubviews: [hourLabel, conditionImageView, temperatureLabel])
+        stackView = UIStackView(arrangedSubviews: [hourLabel, conditionImageView, temperatureLabel])
         stackView.axis = .vertical
         stackView.spacing = 10
         stackView.alignment = .center
-        stackView.distribution = .fill
-        
-        stackView.backgroundColor = .red
+        stackView.distribution = .fillEqually
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            stackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -20),
-        ])
-    }
-    
-    func setupIconImageConstraints() {
-        NSLayoutConstraint.activate([
-            conditionImageView.heightAnchor.constraint(equalToConstant: 50),
-            conditionImageView.widthAnchor.constraint(equalToConstant: 50)
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
         ])
     }
 }
