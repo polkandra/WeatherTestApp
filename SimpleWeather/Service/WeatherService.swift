@@ -8,29 +8,10 @@
 import CoreLocation
 
 protocol WeatherService {
-    func fetchCurrentWeather(location: CLLocation, completion: @escaping (Result<CurrentWeatherDTO, Error>) -> Void)
     func fetchHourForecast(location: CLLocation, completion: @escaping (Result<WeatherForecastDTO, Error>) -> Void)
 }
 
 final class WeatherServiceImplementation: WeatherService {
-    func fetchCurrentWeather(location: CLLocation, completion: @escaping (Result<CurrentWeatherDTO, Error>) -> Void) {
-        NetworkClient.shared.request(
-            urlString: Constants.currentWeatherUrl,
-            queryParams: [
-                "q": " \(location.coordinate.latitude),\(location.coordinate.longitude)",
-                "key": "\(Constants.apiKey)"
-            ],
-            responseType: CurrentWeatherDTO.self
-        ) { result in
-            switch result {
-            case .success(let currentWeater):
-                completion(.success(currentWeater))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
     func fetchHourForecast(location: CLLocation, completion: @escaping (Result<WeatherForecastDTO, Error>) -> Void) {
         NetworkClient.shared.request(
             urlString: Constants.forecastWeatherUrl,

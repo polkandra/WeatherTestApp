@@ -8,7 +8,6 @@
 import CoreLocation
 
 protocol WeatherRepository {
-    func fetchCurrentWeather(location: CLLocation, completion: @escaping (Result<CurrentWeatherDTO, Error>) -> Void)
     func fetchHourForecast(location: CLLocation, completion: @escaping (Result<WeatherForecastDTO, Error>) -> Void)
 }
 
@@ -18,10 +17,6 @@ final class WeatherRepositoryImplementation: WeatherRepository {
     
     init(weatherService: WeatherService) {
         self.weatherService = weatherService
-    }
-    
-    func fetchCurrentWeather(location: CLLocation, completion: @escaping (Result<CurrentWeatherDTO, Error>) -> Void) {
-        weatherService.fetchCurrentWeather(location: location, completion: completion)
     }
     
     func fetchHourForecast(location: CLLocation, completion: @escaping (Result<WeatherForecastDTO, Error>) -> Void) {

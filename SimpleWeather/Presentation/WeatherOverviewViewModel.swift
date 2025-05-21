@@ -15,22 +15,19 @@ protocol UpdateWeatherDelegate: AnyObject {
 }
 
 final class WeatherOverviewViewModel {
-    
-    weak var coordinator: MainCoordinator?
+    weak var coordinator: MainCoordinatorDelegate?
     weak var delegate: UpdateWeatherDelegate?
     var hoursDataSource: [HourForecastWeatherModel] = []
-    private let currentWeatherUseCase: CurrentWeatherUseCase
+    var dailyDataSource: [DailyForecastWeatherModel] = []
     private let weatherForecastUseCase: WeatherForecastUseCase
     private let locationService: LocationService
     private let mapper: WeatherMapper
     
     init(
-        currentWeatherUseCase: CurrentWeatherUseCase,
         weatherForecastUseCase: WeatherForecastUseCase,
         locationService: LocationService,
         mapper: WeatherMapper
     ) {
-        self.currentWeatherUseCase = currentWeatherUseCase
         self.weatherForecastUseCase = weatherForecastUseCase
         self.locationService = locationService
         self.mapper = mapper
@@ -84,6 +81,8 @@ private extension WeatherOverviewViewModel {
     }
     
     func fetchHourForecast(location: CLLocation) {
+        clearDataSources()
+        
         weatherForecastUseCase.execute(location: location) { [weak self] result in
             guard let self else {
                 return
@@ -93,6 +92,7 @@ private extension WeatherOverviewViewModel {
             case .success(let forecast):
                 let currentWeather = self.mapper.currentWeatherModel(weatherForecast: forecast)
                 self.hoursDataSource = self.mapper.hourWeatherModel(weatherForecast: forecast)
+                self.dailyDataSource = self.mapper.dailyWeatherModel(weatherForecast: forecast)
                 self.delegate?.hideActivityIndicator()
                 self.delegate?.updateWeather(model: currentWeather)
             case .failure(let error):
@@ -120,15 +120,7 @@ private extension WeatherOverviewViewModel {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: CLLocation.self, from: data)
     }
     
-   /* func fetchCurrentWeather(location: CLLocation) {
-        currentWeatherUseCase.execute(location: location) { result in
-            switch result {
-            case .success(let currentWeather):
-                print(currentWeather)
-                self.delegate?.updateWeather(model: self.mapper.currentWeatherModel(weatherForecast: currentWeather))
-            case .failure(let error):
-                print("Error: \(error)")
-            }
-        }
-    } */
+    func clearDataSources() {
+        self.dailyDataSource = []
+    }
 }

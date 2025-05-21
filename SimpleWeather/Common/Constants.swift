@@ -12,7 +12,7 @@ struct Constants {
     
     static let currentWeatherUrl = "http://api.weatherapi.com/v1/current.json"
     static let forecastWeatherUrl = "http://api.weatherapi.com/v1/forecast.json"
-    static let apiKey = "fa8b3df74d4042b9aa7135114252304"
+    static let apiKey = "094ba8e5d01b4d48a8595252252105"
     static let defaultLatitude: Double = 55.751244
     static let defaultLongitude: Double = 37.618423
 }

@@ -28,6 +28,12 @@ final class WeatherOverviewViewController: UIViewController {
         return view
     }()
     
+    private let dailyForecastView: DailyForecastView = {
+        let forecastView = DailyForecastView()
+        forecastView.translatesAutoresizingMaskIntoConstraints = false
+        return forecastView
+    }()
+    
     private let backgroundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "weatherPic")
@@ -115,10 +121,9 @@ extension WeatherOverviewViewController: UpdateWeatherDelegate {
             self.temperatureLabel.text = "\(Int(model.temperature.rounded(.towardZero)))°"
             self.conditionLabel.text = model.condition
             self.forecastLabel.text = "Min: \(Int(model.minTemperature.rounded(.towardZero)))°, max: \(Int(model.maxTemperature.rounded(.towardZero)))°"
-        }
-        
-        DispatchQueue.main.async {
+            
             self.hourForecastCollectionView.reloadData()
+            self.dailyForecastView.updateForecasts(self.viewModel.dailyDataSource)
         }
     }
 }
@@ -132,6 +137,7 @@ private extension WeatherOverviewViewController {
         view.backgroundColor = .systemBlue
         setupBaseForecastElements()
         setupHourForecastCollectionView()
+        setupCurrentWeatherView()
     }
     
     private func setupBaseForecastElements() {
@@ -142,6 +148,7 @@ private extension WeatherOverviewViewController {
         contentView.addSubview(temperatureLabel)
         contentView.addSubview(conditionLabel)
         contentView.addSubview(forecastLabel)
+        contentView.addSubview(dailyForecastView)
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -161,7 +168,7 @@ private extension WeatherOverviewViewController {
             backgroundImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             backgroundImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            locationLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 16),
+            locationLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 50),
             locationLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
           
             temperatureLabel.topAnchor.constraint(equalTo: locationLabel.bottomAnchor),
@@ -203,6 +210,17 @@ private extension WeatherOverviewViewController {
             hourForecastCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             hourForecastCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             hourForecastCollectionView.heightAnchor.constraint(equalToConstant: 120),
+        ])
+    }
+    
+    private func setupCurrentWeatherView() {
+        contentView.addSubview(dailyForecastView)
+        
+        NSLayoutConstraint.activate([
+            dailyForecastView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            dailyForecastView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            dailyForecastView.topAnchor.constraint(equalTo: hourForecastCollectionView.bottomAnchor, constant: 10),
+            dailyForecastView.heightAnchor.constraint(equalToConstant: 315)
         ])
     }
     
@@ -249,7 +267,6 @@ extension WeatherOverviewViewController: UICollectionViewDataSource, UICollectio
             withReuseIdentifier: HourForecastCollectionViewCell.identifier,
             for: indexPath
         ) as? HourForecastCollectionViewCell else {
-            
             return UICollectionViewCell()
         }
         

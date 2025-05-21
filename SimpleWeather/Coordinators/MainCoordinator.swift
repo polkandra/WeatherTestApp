@@ -7,6 +7,8 @@
 
 import UIKit
 
+protocol MainCoordinatorDelegate: AnyObject {}
+
 class MainCoordinator: Coordinator {
     
     var navigationController: UINavigationController
@@ -18,7 +20,6 @@ class MainCoordinator: Coordinator {
     func start() {
         let repository = WeatherRepositoryImplementation(weatherService: WeatherServiceImplementation())
         let viewModel = WeatherOverviewViewModel(
-            currentWeatherUseCase: CurrentWeatherUseCaseImpl(weatherRepository: repository),
             weatherForecastUseCase: WeatherForecastUseCaseImpl(weatherRepository: repository),
             locationService: LocationService(),
             mapper: WeatherMapperImpl()
@@ -29,3 +30,5 @@ class MainCoordinator: Coordinator {
         navigationController.pushViewController(viewController, animated: true)
     }
 }
+
+extension MainCoordinator: MainCoordinatorDelegate {}

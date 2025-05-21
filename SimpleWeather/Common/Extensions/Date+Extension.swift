@@ -18,8 +18,14 @@ extension Date {
         formatter.locale = Locale.current
         return formatter.date(from: string)
     }
-
+    
     static var today: Date {
         return Date()
+    }
+    
+    func dayOfWeek() -> String? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EE"
+        return dateFormatter.string(from: self).capitalized
     }
 }

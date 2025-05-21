@@ -10,6 +10,7 @@ import Foundation
 protocol WeatherMapper {
     func currentWeatherModel(weatherForecast: WeatherForecastDTO) -> CurrentWeatherModel
     func hourWeatherModel(weatherForecast: WeatherForecastDTO) -> [HourForecastWeatherModel]
+    func dailyWeatherModel(weatherForecast: WeatherForecastDTO) -> [DailyForecastWeatherModel]
 }
 
 final class WeatherMapperImpl: WeatherMapper {
@@ -47,7 +48,6 @@ final class WeatherMapperImpl: WeatherMapper {
     
         let hour = calendar.component(.hour, from: Date.today)
         let todayStart = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: Date.today)!
-    
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date.today)!
         let tomorrowEnd = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: tomorrow)!
         
@@ -76,5 +76,43 @@ final class WeatherMapperImpl: WeatherMapper {
         }
         
         return hoursDataSource
+    }
+    
+    func dailyWeatherModel(weatherForecast: WeatherForecastDTO) -> [DailyForecastWeatherModel] {
+        var daysDataSource: [DailyForecastWeatherModel] = []
+        
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = .current
+    
+        let weekStart = calendar.startOfDay(for: Date.today)
+        let weekEndDay = calendar.date(byAdding: .day, value: 7, to: weekStart)!
+        let weekEnd = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: weekEndDay)!
+        
+        let filtered = weatherForecast.forecast?.forecastday?.filter { day in
+            guard let date = formatter.date(from: day.date ?? "") else {
+                return false
+            }
+           
+            return date >= weekStart && date <= weekEnd
+        }
+        
+        filtered?.forEach { day in
+            daysDataSource.append(
+                DailyForecastWeatherModel(
+                    day: formatter.date(from: day.date ?? "")?.dayOfWeek() ?? "",
+                    icon: day.day?.condition?.icon ?? "",
+                    highTemp: "\(day.day?.maxtempC ?? 0)",
+                    lowTemp: "\(day.day?.mintempC ?? 0)"
+                )
+            )
+        }
+        
+        if !daysDataSource.isEmpty {
+            daysDataSource[0].day = "Today"
+        }
+        
+        return daysDataSource
     }
 }
